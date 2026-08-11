@@ -91,7 +91,7 @@ jobs:
             artifact: x86_64-linux
           - runner: ubuntu-22.04-arm
             artifact: aarch64-linux
-          - runner: macos-13
+          - runner: macos-15-intel
             artifact: x86_64-apple-darwin
           - runner: macos-latest
             artifact: aarch64-apple-darwin
@@ -106,6 +106,7 @@ jobs:
         with:
           ghc-version: 9.14.1
           cabal-version: 3.14
+          ghcup-release-channel: https://raw.githubusercontent.com/haskell/ghcup-metadata/refs/heads/develop/ghcup-prereleases-0.0.9.yaml
 
       - name: Build hdb
         shell: bash
@@ -199,4 +200,3 @@ jobs:
             ${{ runner.temp }}/hdb-binaries/*.zip
           fail_on_unmatched_files: true
           generate_release_notes: true
-
