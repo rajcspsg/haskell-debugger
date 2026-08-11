@@ -37,7 +37,7 @@ jobs:
       - uses: haskell-actions/setup@v2
         with:
           ghc-version: 9.14.1
-          cabal-version: 3.14
+          cabal-version: 3.16
           ghcup-release-channel: https://raw.githubusercontent.com/haskell/ghcup-metadata/refs/heads/develop/ghcup-prereleases-0.0.9.yaml
 
       - name: Build docs for haskell-debugger
@@ -95,8 +95,7 @@ jobs:
             artifact: x86_64-apple-darwin
           - runner: macos-latest
             artifact: aarch64-apple-darwin
-          - runner: windows-latest
-            artifact: x86_64-mingw64
+          # windows-latest is broken, see #246
     steps:
       - uses: actions/checkout@v4
         with:
@@ -105,7 +104,7 @@ jobs:
       - uses: haskell-actions/setup@v2
         with:
           ghc-version: 9.14.1
-          cabal-version: 3.14
+          cabal-version: 3.16
           ghcup-release-channel: https://raw.githubusercontent.com/haskell/ghcup-metadata/refs/heads/develop/ghcup-prereleases-0.0.9.yaml
 
       - name: Build hdb
@@ -121,20 +120,13 @@ jobs:
           mkdir -p "$stage"
           cp "$bin" "$stage/"
           cp README.md LICENSE "$stage/"
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            7z a "${stage}.zip" "$stage"
-          else
-            tar cJf "${stage}.tar.xz" "$stage"
-          fi
+          tar cJf "${stage}.tar.xz" "$stage"
 
       - name: Upload hdb binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: Haskell Debugger Binary ${{ matrix.artifact }}
-          path: |
-            hdb-${{ env.haskellDebuggerVersion }}-${{ matrix.artifact }}.tar.xz
-            hdb-${{ env.haskellDebuggerVersion }}-${{ matrix.artifact }}.zip
-          if-no-files-found: ignore
+          path: hdb-${{ env.haskellDebuggerVersion }}-${{ matrix.artifact }}.tar.xz
 
   release:
     name: Release
@@ -197,6 +189,5 @@ jobs:
           files: |
             ${{ runner.temp }}/extension/*.vsix
             ${{ runner.temp }}/hdb-binaries/*.tar.xz
-            ${{ runner.temp }}/hdb-binaries/*.zip
           fail_on_unmatched_files: true
           generate_release_notes: true
